@@ -188,6 +188,14 @@ export default function PulseHubPage() {
                 />
               </div>
 
+              <div className="pt-0.5">
+                <Image
+                  src={rxiGraphImage}
+                  alt="RXi pressure graph"
+                  className="-mx-4 h-auto w-[calc(100%+2rem)] max-w-none rounded border border-[#2A2A35]/50 bg-[#000000]"
+                />
+              </div>
+
               <div className="space-y-1.5">
                 <div className="flex items-center justify-between text-xl">
                   <span className="text-[#EF4444]">Pa</span>
@@ -222,14 +230,6 @@ export default function PulseHubPage() {
                 <button className="flex min-h-[48px] min-w-[48px] flex-1 items-center justify-center rounded border border-[#2A2A35] text-lg text-[#C8C8D0] transition-colors hover:border-[#00B4D8] hover:text-[#00B4D8]">
                   =
                 </button>
-              </div>
-
-              <div className="pt-1">
-                <Image
-                  src={rxiGraphImage}
-                  alt="RXi pressure graph"
-                  className="-mx-4 h-auto w-[calc(100%+2rem)] max-w-none rounded border border-[#2A2A35]/50 bg-[#000000]"
-                />
               </div>
             </section>
           </div>
