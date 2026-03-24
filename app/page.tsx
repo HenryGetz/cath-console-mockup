@@ -146,7 +146,7 @@ export default function PulseHubPage() {
 
               <div className="space-y-1.5 pt-1.5">
                 <div className="text-sm text-[#8888A0]">Contrast Available</div>
-                <div className="flex items-baseline gap-1">
+                <div className="flex items-baseline justify-end gap-1 text-right">
                   <span className="text-4xl font-bold leading-none text-white tabular-nums">
                     95
                   </span>
@@ -164,9 +164,11 @@ export default function PulseHubPage() {
                 </div>
 
                 <div className="space-y-1.5 pt-1">
-                  <div className="text-xs leading-tight text-[#C8C8D0]">
-                    <span>Used: </span>
-                    <span className="tabular-nums">10 mL / 80 mL</span>
+                  <div className="flex items-center justify-between text-xs leading-tight">
+                    <div className="text-[#8888A0]">Used:</div>
+                    <div className="tabular-nums text-right text-[#C8C8D0]">
+                      10 mL / 80 mL
+                    </div>
                   </div>
                   <div className="h-4 overflow-hidden rounded-full border border-[#2A2A35]/60 bg-[#000000] p-[2px]">
                     <div
