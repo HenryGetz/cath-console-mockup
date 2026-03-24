@@ -1,4 +1,8 @@
-# ACIST Pro Mockup
+# Pulse Hub Mockup
+
+## Current UI Screenshot
+
+![Pulse Hub UI](public/pulse-hub-screenshot.png)
 
 Next.js mockup app configured for easy local + Tailnet access.
 
