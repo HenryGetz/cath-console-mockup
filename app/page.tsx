@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { useState } from "react";
-import { ChevronDown, ChevronUp } from "lucide-react";
+import { ChevronDown, ChevronUp, Settings } from "lucide-react";
 import acistAimLogo from "@/static/acist-aim-logo.png";
 import acistHdiLogo from "@/static/acist-hdi-logo.png";
 import acistLogo from "@/static/acist-logo.png";
@@ -11,7 +11,6 @@ import hdiImage from "@/static/hdi.jpg";
 import proLogo from "@/static/pro-logo.png";
 import pulseHubLogo from "@/static/pulse-hub-logo.png";
 import rxiGraphImage from "@/static/rxi-graph.jpg";
-import settingsGear from "@/static/settings-gear.png";
 
 const clamp = (value: number, min: number, max: number) =>
   Math.min(max, Math.max(min, value));
@@ -163,7 +162,7 @@ export default function PulseHubPage() {
                   />
                 </div>
 
-                <div className="space-y-1.5 pt-1">
+                <div className="space-y-1.5 pt-[20px]">
                   <div className="flex items-center justify-between text-xs leading-tight">
                     <div className="text-[#8888A0]">Used:</div>
                     <div className="tabular-nums text-right text-[#C8C8D0]">
@@ -282,13 +281,7 @@ export default function PulseHubPage() {
 
             <div className="flex items-center justify-center border-t border-[#2A2A35]/70 pb-3 pt-2">
               <button className="flex min-h-[48px] min-w-[48px] items-center justify-center text-[#8888A0] transition-colors hover:text-[#C8C8D0]">
-                <Image
-                  src={settingsGear}
-                  alt="Settings"
-                  width={24}
-                  height={24}
-                  className="opacity-75"
-                />
+                <Settings className="h-7 w-7" />
               </button>
             </div>
           </div>
