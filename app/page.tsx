@@ -134,7 +134,7 @@ const deviceVideos = [
     key: "pulse-hub",
     label: "Pulse Hub",
     logo: pulseHubLogo,
-    src: "/static/hdi.mp4",
+    src: "/static/pulse-hub.mp4",
     title: "Pulse Hub patient loop",
   },
   {
@@ -148,21 +148,21 @@ const deviceVideos = [
     key: "pro",
     label: "Pro",
     logo: proLogo,
-    src: "/static/hdi.mp4",
+    src: "/static/pro.mp4",
     title: "Pro patient loop",
   },
   {
     key: "rxi",
     label: "RXi",
     logo: acistRxiLogo,
-    src: "/static/hdi.mp4",
+    src: "/static/rxi.mp4",
     title: "RXi patient loop",
   },
   {
     key: "aim",
     label: "AiM",
     logo: acistAimLogo,
-    src: "/static/hdi.mp4",
+    src: "/static/aim.mp4",
     title: "AiM patient loop",
   },
 ] as const;
@@ -411,7 +411,7 @@ export default function PulseHubPage() {
               aria-hidden="true"
               id="hdi-player"
               tabIndex={-1}
-              className="absolute inset-0 h-full w-full bg-black object-cover"
+              className="absolute inset-0 h-full w-full bg-black object-contain"
               style={{
                 WebkitTapHighlightColor: "transparent",
                 userSelect: "none",
