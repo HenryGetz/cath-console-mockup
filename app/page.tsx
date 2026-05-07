@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { ChevronDown, ChevronUp, Settings } from "lucide-react";
+import { useSwipeable } from "react-swipeable";
 import acistAimLogo from "@/static/acist-aim-logo.png";
 import acistHdiLogo from "@/static/acist-hdi-logo.png";
 import acistLogo from "@/static/acist-logo.png";
@@ -22,6 +23,8 @@ type ValueAdjusterProps = {
   value: number;
   onIncrease: () => void;
   onDecrease: () => void;
+  onSwipeIncrease: (steps?: number) => void;
+  onSwipeDecrease: (steps?: number) => void;
 };
 
 function ValueAdjuster({
@@ -30,9 +33,29 @@ function ValueAdjuster({
   value,
   onIncrease,
   onDecrease,
+  onSwipeIncrease,
+  onSwipeDecrease,
 }: ValueAdjusterProps) {
+  const swipeHandlers = useSwipeable({
+    onSwipedUp: ({ deltaY }) => {
+      const steps = Math.max(1, Math.round(Math.abs(deltaY) / 55));
+      onSwipeIncrease(steps);
+    },
+    onSwipedDown: ({ deltaY }) => {
+      const steps = Math.max(1, Math.round(Math.abs(deltaY) / 55));
+      onSwipeDecrease(steps);
+    },
+    preventScrollOnSwipe: true,
+    trackTouch: true,
+    trackMouse: true,
+  });
+
   return (
-    <div className="space-y-1.5">
+    <div
+      {...swipeHandlers}
+      className="touch-manipulation space-y-1.5"
+      style={{ touchAction: "pan-y" }}
+    >
       <div className="text-sm text-[#8888A0]">
         {label} ({unit})
       </div>
@@ -167,6 +190,16 @@ export default function PulseHubPage() {
     100,
   );
 
+  const adjustFlowRate = (steps = 1) => {
+    setFlowRate((previous) =>
+      clamp(+(previous + 0.5 * steps).toFixed(1), 0, 30),
+    );
+  };
+
+  const adjustVolume = (steps = 1) => {
+    setVolume((previous) => clamp(+(previous + 0.5 * steps).toFixed(1), 0, 40));
+  };
+
   useEffect(() => {
     const video = videoRef.current;
     if (!video) {
@@ -259,32 +292,20 @@ export default function PulseHubPage() {
                   label="Flow Rate"
                   unit="mL/s"
                   value={flowRate}
-                  onIncrease={() =>
-                    setFlowRate((previous) =>
-                      clamp(+(previous + 0.5).toFixed(1), 0, 30),
-                    )
-                  }
-                  onDecrease={() =>
-                    setFlowRate((previous) =>
-                      clamp(+(previous - 0.5).toFixed(1), 0, 30),
-                    )
-                  }
+                  onIncrease={() => adjustFlowRate()}
+                  onDecrease={() => adjustFlowRate(-1)}
+                  onSwipeIncrease={(steps = 1) => adjustFlowRate(steps)}
+                  onSwipeDecrease={(steps = 1) => adjustFlowRate(-steps)}
                 />
 
                 <ValueAdjuster
                   label="Volume"
                   unit="mL"
                   value={volume}
-                  onIncrease={() =>
-                    setVolume((previous) =>
-                      clamp(+(previous + 0.5).toFixed(1), 0, 40),
-                    )
-                  }
-                  onDecrease={() =>
-                    setVolume((previous) =>
-                      clamp(+(previous - 0.5).toFixed(1), 0, 40),
-                    )
-                  }
+                  onIncrease={() => adjustVolume()}
+                  onDecrease={() => adjustVolume(-1)}
+                  onSwipeIncrease={(steps = 1) => adjustVolume(steps)}
+                  onSwipeDecrease={(steps = 1) => adjustVolume(-steps)}
                 />
 
                 <div className="space-y-1.5 pt-1.5">
