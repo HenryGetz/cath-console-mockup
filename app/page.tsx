@@ -118,28 +118,28 @@ const deviceVideos = [
     key: "hdi",
     label: "HDi",
     logo: acistHdiLogo,
-    src: "/static/hdi.mp4?source=hdi",
+    src: "/static/hdi.mp4",
     title: "HDi patient loop",
   },
   {
     key: "pro",
     label: "Pro",
     logo: proLogo,
-    src: "/static/hdi.mp4?source=pro",
+    src: "/static/hdi.mp4",
     title: "Pro patient loop",
   },
   {
     key: "rxi",
     label: "RXi",
     logo: acistRxiLogo,
-    src: "/static/hdi.mp4?source=rxi",
+    src: "/static/hdi.mp4",
     title: "RXi patient loop",
   },
   {
     key: "aim",
     label: "AiM",
     logo: acistAimLogo,
-    src: "/static/hdi.mp4?source=aim",
+    src: "/static/hdi.mp4",
     title: "AiM patient loop",
   },
 ] as const;
@@ -153,7 +153,8 @@ export default function PulseHubPage() {
   const [contrastAvailable] = useState(MAX_CONTRAST_AVAILABLE_ML);
   const [activeDeviceKey, setActiveDeviceKey] =
     useState<DeviceVideo["key"]>("pulse-hub");
-  const [playbackTime, setPlaybackTime] = useState(0);
+  const playbackTimeRef = useRef(0);
+  const hasStartedPlaybackRef = useRef(false);
 
   const activeDevice =
     deviceVideos.find((device) => device.key === activeDeviceKey) ??
@@ -172,17 +173,30 @@ export default function PulseHubPage() {
       return;
     }
 
+    hasStartedPlaybackRef.current = false;
+
     const setPlaybackPosition = () => {
-      if (Number.isFinite(playbackTime) && Number.isFinite(video.duration)) {
+      if (
+        Number.isFinite(playbackTimeRef.current) &&
+        Number.isFinite(video.duration)
+      ) {
         const safePlaybackTime = Math.max(
           0,
-          Math.min(playbackTime, Math.max(0, video.duration - 0.001)),
+          Math.min(
+            playbackTimeRef.current,
+            Math.max(0, video.duration - 0.001),
+          ),
         );
         video.currentTime = safePlaybackTime;
       }
     };
 
     const startPlayback = async () => {
+      if (hasStartedPlaybackRef.current) {
+        return;
+      }
+
+      hasStartedPlaybackRef.current = true;
       setPlaybackPosition();
 
       try {
@@ -195,19 +209,28 @@ export default function PulseHubPage() {
       }
     };
 
+    const updatePlaybackTime = () => {
+      playbackTimeRef.current = video.currentTime;
+    };
+
     video.muted = true;
-    void startPlayback();
+    video.addEventListener("timeupdate", updatePlaybackTime);
     video.addEventListener("canplay", startPlayback);
+
+    if (video.readyState >= 2) {
+      void startPlayback();
+    }
 
     return () => {
       video.removeEventListener("canplay", startPlayback);
+      video.removeEventListener("timeupdate", updatePlaybackTime);
     };
-  }, [activeDeviceKey, playbackTime]);
+  }, [activeDeviceKey]);
 
   const handleDeviceSelect = (key: DeviceVideo["key"]) => {
     const currentVideo = videoRef.current;
     if (currentVideo) {
-      setPlaybackTime(currentVideo.currentTime);
+      playbackTimeRef.current = currentVideo.currentTime;
     }
 
     setActiveDeviceKey(key);
