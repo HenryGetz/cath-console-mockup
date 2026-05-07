@@ -82,6 +82,10 @@ function DeviceTab({
       aria-pressed={isActive}
       type="button"
       onClick={onSelect}
+      onContextMenu={(event) => {
+        event.preventDefault();
+        onSelect();
+      }}
       className={`flex h-[120px] w-full items-center justify-center transition-colors ${
         isActive
           ? "bg-[#312F3C] text-white"
