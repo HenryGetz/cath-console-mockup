@@ -66,9 +66,16 @@ type DeviceTabProps = {
   logo: typeof proLogo;
   isActive: boolean;
   onSelect: () => void;
+  size?: "default" | "large";
 };
 
-function DeviceTab({ label, logo, isActive, onSelect }: DeviceTabProps) {
+function DeviceTab({
+  label,
+  logo,
+  isActive,
+  onSelect,
+  size = "default",
+}: DeviceTabProps) {
   return (
     <button
       aria-label={label}
@@ -81,7 +88,9 @@ function DeviceTab({ label, logo, isActive, onSelect }: DeviceTabProps) {
           : "bg-transparent text-[#6F6F7A] hover:bg-[#25202F]"
       }`}
     >
-      <span className="relative h-8 w-full px-1.5">
+      <span
+        className={`relative w-full px-1.5 ${size === "large" ? "h-12" : "h-8"}`}
+      >
         <Image
           src={logo}
           alt={`${label} logo`}
@@ -94,6 +103,13 @@ function DeviceTab({ label, logo, isActive, onSelect }: DeviceTabProps) {
 }
 
 const deviceVideos = [
+  {
+    key: "pulse-hub",
+    label: "Pulse Hub",
+    logo: pulseHubLogo,
+    src: "/static/hdi.mp4",
+    title: "Pulse Hub patient loop",
+  },
   {
     key: "hdi",
     label: "HDi",
@@ -132,12 +148,12 @@ export default function PulseHubPage() {
   const [volume, setVolume] = useState(21.0);
   const [contrastAvailable] = useState(MAX_CONTRAST_AVAILABLE_ML);
   const [activeDeviceKey, setActiveDeviceKey] =
-    useState<DeviceVideo["key"]>("hdi");
+    useState<DeviceVideo["key"]>("pulse-hub");
 
   const activeDevice =
     deviceVideos.find((device) => device.key === activeDeviceKey) ??
     deviceVideos[0];
-  const isCathConsole = activeDevice.key === "hdi";
+  const isCathConsole = activeDevice.key === "pulse-hub";
 
   const contrastAvailablePercent = clamp(
     (contrastAvailable / MAX_CONTRAST_AVAILABLE_ML) * 100,
@@ -354,17 +370,6 @@ export default function PulseHubPage() {
                   className="object-contain object-center"
                 />
               </div>
-
-              <button className="flex h-[120px] w-full items-center justify-center bg-[#312F3C]">
-                <span className="relative h-12 w-full">
-                  <Image
-                    src={pulseHubLogo}
-                    alt="Pulse Hub logo"
-                    fill
-                    className="scale-[0.88] object-contain object-center"
-                  />
-                </span>
-              </button>
             </div>
 
             <div className="mt-0 flex flex-1 flex-col justify-start gap-0">
@@ -376,6 +381,7 @@ export default function PulseHubPage() {
                     logo={device.logo}
                     isActive={device.key === activeDevice.key}
                     onSelect={() => handleDeviceSelect(device.key)}
+                    size={device.key === "pulse-hub" ? "large" : "default"}
                   />
                 );
               })}
