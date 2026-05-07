@@ -154,7 +154,7 @@ export default function PulseHubPage() {
   const [activeDeviceKey, setActiveDeviceKey] =
     useState<DeviceVideo["key"]>("pulse-hub");
   const playbackTimeRef = useRef(0);
-  const hasStartedPlaybackRef = useRef(false);
+  const previousSourceRef = useRef("/static/hdi.mp4");
 
   const activeDevice =
     deviceVideos.find((device) => device.key === activeDeviceKey) ??
@@ -173,7 +173,9 @@ export default function PulseHubPage() {
       return;
     }
 
-    hasStartedPlaybackRef.current = false;
+    const previousSource = previousSourceRef.current;
+    const sourceChanged = previousSource !== activeDevice.src;
+    previousSourceRef.current = activeDevice.src;
 
     const setPlaybackPosition = () => {
       if (
@@ -192,12 +194,9 @@ export default function PulseHubPage() {
     };
 
     const startPlayback = async () => {
-      if (hasStartedPlaybackRef.current) {
-        return;
+      if (sourceChanged) {
+        setPlaybackPosition();
       }
-
-      hasStartedPlaybackRef.current = true;
-      setPlaybackPosition();
 
       try {
         if (video.paused) {
@@ -215,17 +214,21 @@ export default function PulseHubPage() {
 
     video.muted = true;
     video.addEventListener("timeupdate", updatePlaybackTime);
-    video.addEventListener("canplay", startPlayback);
+    const onCanPlay = () => {
+      void startPlayback();
+    };
+
+    video.addEventListener("canplay", onCanPlay);
 
     if (video.readyState >= 2) {
       void startPlayback();
     }
 
     return () => {
-      video.removeEventListener("canplay", startPlayback);
+      video.removeEventListener("canplay", onCanPlay);
       video.removeEventListener("timeupdate", updatePlaybackTime);
     };
-  }, [activeDeviceKey]);
+  }, [activeDevice.src]);
 
   const handleDeviceSelect = (key: DeviceVideo["key"]) => {
     const currentVideo = videoRef.current;
