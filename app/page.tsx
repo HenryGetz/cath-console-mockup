@@ -153,6 +153,7 @@ export default function PulseHubPage() {
   const [contrastAvailable] = useState(MAX_CONTRAST_AVAILABLE_ML);
   const [activeDeviceKey, setActiveDeviceKey] =
     useState<DeviceVideo["key"]>("pulse-hub");
+  const [playbackTime, setPlaybackTime] = useState(0);
 
   const activeDevice =
     deviceVideos.find((device) => device.key === activeDeviceKey) ??
@@ -171,7 +172,19 @@ export default function PulseHubPage() {
       return;
     }
 
+    const setPlaybackPosition = () => {
+      if (Number.isFinite(playbackTime) && Number.isFinite(video.duration)) {
+        const safePlaybackTime = Math.max(
+          0,
+          Math.min(playbackTime, Math.max(0, video.duration - 0.001)),
+        );
+        video.currentTime = safePlaybackTime;
+      }
+    };
+
     const startPlayback = async () => {
+      setPlaybackPosition();
+
       try {
         if (video.paused) {
           await video.play();
@@ -189,9 +202,14 @@ export default function PulseHubPage() {
     return () => {
       video.removeEventListener("canplay", startPlayback);
     };
-  }, [activeDeviceKey]);
+  }, [activeDeviceKey, playbackTime]);
 
   const handleDeviceSelect = (key: DeviceVideo["key"]) => {
+    const currentVideo = videoRef.current;
+    if (currentVideo) {
+      setPlaybackTime(currentVideo.currentTime);
+    }
+
     setActiveDeviceKey(key);
   };
 
@@ -344,7 +362,6 @@ export default function PulseHubPage() {
             <video
               ref={videoRef}
               aria-hidden="true"
-              key={activeDevice.key}
               id="hdi-player"
               tabIndex={-1}
               className="absolute inset-0 h-full w-full bg-black object-cover"
