@@ -117,22 +117,7 @@
 
 @layer base {
   * {
-    @apply border-border;
-    outline-width: 0;
-    outline-style: none;
-    outline-color: transparent;
-  }
-
-  *::selection {
-    background-color: transparent;
-    color: inherit;
-  }
-
-  *:focus-visible {
-    outline: 0;
-    outline-width: 0;
-    outline-style: none;
-    outline-color: transparent;
+    @apply border-border outline-ring/50;
   }
 
   video {
