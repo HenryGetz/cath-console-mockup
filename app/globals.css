@@ -117,8 +117,48 @@
 
 @layer base {
   * {
-    @apply border-border outline-ring/50;
+    @apply border-border;
+    outline-width: 0;
+    outline-style: none;
+    outline-color: transparent;
   }
+
+  *::selection {
+    background-color: transparent;
+    color: inherit;
+  }
+
+  *:focus-visible {
+    outline: 0;
+    outline-width: 0;
+    outline-style: none;
+    outline-color: transparent;
+  }
+
+  video {
+    appearance: none;
+    -webkit-appearance: none;
+    outline-width: 0 !important;
+    outline-style: none !important;
+    outline-color: transparent !important;
+    border: 0;
+    box-shadow: none;
+    border-radius: 0;
+    background: #000;
+    display: block;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+  }
+
+  video:focus,
+  video:focus-visible {
+    outline: 0 !important;
+    outline-width: 0 !important;
+    outline-style: none !important;
+    outline-color: transparent !important;
+    box-shadow: none;
+  }
+
   body {
     @apply bg-background text-foreground;
   }

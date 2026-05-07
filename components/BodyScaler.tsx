@@ -1,21 +1,52 @@
-"use client"
+"use client";
 
-import { useEffect } from "react"
+import { type ReactNode, useLayoutEffect, useRef } from "react";
 
-export function BodyScaler() {
-  useEffect(() => {
-    const handleResize = () => {
-      const scale = Math.min(window.innerWidth / 1280, window.innerHeight / 800)
-      document.body.style.transform = `scale(${scale})`
+type BodyScalerProps = {
+  children: ReactNode;
+};
+
+const DESIGN_WIDTH = 1423;
+const DESIGN_HEIGHT = 800;
+
+export function BodyScaler({ children }: BodyScalerProps) {
+  const wrapperRef = useRef<HTMLDivElement>(null);
+
+  useLayoutEffect(() => {
+    const wrapper = wrapperRef.current;
+    if (!wrapper) {
+      return;
     }
 
-    handleResize()
-    window.addEventListener("resize", handleResize)
+    const handleResize = () => {
+      const scale = Math.min(
+        window.innerWidth / DESIGN_WIDTH,
+        window.innerHeight / DESIGN_HEIGHT,
+        1,
+      );
+      wrapper.style.transform = `scale(${scale})`;
+    };
+
+    handleResize();
+    window.addEventListener("resize", handleResize);
 
     return () => {
-      window.removeEventListener("resize", handleResize)
-    }
-  }, [])
+      window.removeEventListener("resize", handleResize);
+      wrapper.style.transform = "";
+    };
+  }, []);
 
-  return null
+  return (
+    <div
+      id="app-scale-root"
+      ref={wrapperRef}
+      className="relative"
+      style={{
+        transformOrigin: "top left",
+        willChange: "transform",
+      }}
+    >
+      {children}
+    </div>
+  );
 }

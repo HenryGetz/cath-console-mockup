@@ -4,13 +4,13 @@
 >
 > **Stack:** Next.js · Tailwind v4 (CSS-first, no `tailwind.config.*`) · Inter via `next/font/google` · `culori` for runtime color interpolation · `framer-motion` for transitions · `lucide-react` for icons.
 >
-> **Canvas:** Fixed `1280×800` body, scaled to viewport via `BodyScaler`. All values below are absolute pixels at 1× scale.
+> **Canvas:** Fixed `1423×800` body, scaled to viewport via `BodyScaler`. All values below are absolute pixels at 1× scale.
 
 ---
 
 ## 0. Project Bootstrap
 
-**This section is Step 0.** Before building any screen, the fixed-resolution scaling frame must be in place. Every Pulse Hub app renders at exactly `1280×800` and scales proportionally to fit the browser window, centered on a near-black background.
+**This section is Step 0.** Before building any screen, the fixed-resolution scaling frame must be in place. Every Pulse Hub app renders at exactly `1423×800` and scales proportionally to fit the browser window, centered on a near-black background.
 
 ### 0.1 Dependencies
 
@@ -37,7 +37,7 @@ import { useEffect } from "react";
 export function BodyScaler() {
   useEffect(() => {
     function scale() {
-      const s = Math.min(window.innerWidth / 1280, window.innerHeight / 800);
+      const s = Math.min(window.innerWidth / 1423, window.innerHeight / 800);
       document.body.style.transform = `scale(${s})`;
     }
     scale();
@@ -51,7 +51,7 @@ export function BodyScaler() {
 
 ### 0.3 Root Layout
 
-Update `app/layout.tsx`. The `<html>` tag is the centering frame. The `<body>` tag is the fixed 1280×800 canvas. `BodyScaler` is rendered inside `<body>` alongside `{children}`.
+Update `app/layout.tsx`. The `<html>` tag is the centering frame. The `<body>` tag is the fixed 1423×800 canvas. `BodyScaler` is rendered inside `<body>` alongside `{children}`.
 
 ```tsx
 import type { Metadata } from "next";
@@ -70,7 +70,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       className="flex h-[100dvh] w-screen items-center justify-center overflow-hidden bg-neutral-950"
     >
       <body
-        className={`${inter.variable} relative h-[800px] w-[1280px] shrink-0 origin-center overflow-hidden bg-background shadow-2xl font-sans antialiased`}
+        className={`${inter.variable} relative h-[800px] w-[1423px] shrink-0 origin-center overflow-hidden bg-background shadow-2xl font-sans antialiased`}
       >
         <BodyScaler />
         {children}
@@ -97,7 +97,7 @@ The Tailwind v4 CSS-first config lives in `app/globals.css`. Keep the default `@
 
 ### 0.5 Verification
 
-After bootstrap, `npm run dev` should show a black page with a `1280×800` shadowed rectangle centered in the viewport. Resizing the browser window should scale the rectangle proportionally without scrollbars.
+After bootstrap, `npm run dev` should show a black page with a `1423×800` shadowed rectangle centered in the viewport. Resizing the browser window should scale the rectangle proportionally without scrollbars.
 
 ---
 
@@ -213,8 +213,8 @@ Never place labels beside values at the same vertical position. Never let units 
 
 ```tsx
 <html className="flex h-[100dvh] w-screen items-center justify-center overflow-hidden bg-neutral-950">
-  <body className="relative h-[800px] w-[1280px] shrink-0 origin-center overflow-hidden font-sans antialiased">
-    <BodyScaler />  {/* sets transform: scale(min(vw/1280, vh/800)) */}
+  <body className="relative h-[800px] w-[1423px] shrink-0 origin-center overflow-hidden font-sans antialiased">
+    <BodyScaler />  {/* sets transform: scale(min(vw/1423, vh/800)) */}
     {children}
   </body>
 </html>
@@ -240,7 +240,7 @@ Never place labels beside values at the same vertical position. Never let units 
 
 | Region | Key Classes | Size |
 |:-------|:------------|:-----|
-| Shell outer | `rounded-md border border-[#2a2a35] bg-[#0a0a0f] font-sans` | 1280×800 |
+| Shell outer | `rounded-md border border-[#2a2a35] bg-[#0a0a0f] font-sans` | 1423×800 |
 | Header | `flex items-center justify-between border-b border-[#2a2a35] bg-[#1C1B22] px-6 py-4` | full width × ~56px |
 | Sidebar | `flex w-20 flex-col items-center border-r border-[#2a2a35]/50 bg-[#1C1B22] py-6` | 80px wide |
 | Main | `flex min-w-0 flex-1 flex-col p-6` | remaining space |
@@ -466,8 +466,8 @@ These are the files that matter for any Pulse Hub repo. In a fresh project, §0 
 
 When an agent is tasked with creating a new Pulse Hub screen:
 
-- [ ] **Bootstrap is in place** — `BodyScaler` component exists, `layout.tsx` has the fixed `1280×800` body with centering `<html>`, and `npm run dev` shows a scaled centered rectangle (§0).
-- [ ] Canvas is `1280×800`. All layout is absolute at this size.
+- [ ] **Bootstrap is in place** — `BodyScaler` component exists, `layout.tsx` has the fixed `1423×800` body with centering `<html>`, and `npm run dev` shows a scaled centered rectangle (§0).
+- [ ] Canvas is `1423×800`. All layout is absolute at this size.
 - [ ] Shell uses `base` / `chrome` / `card` background tokens from §1.1. No shadcn variables.
 - [ ] Text colors are exact hex values from §1.3. No `text-gray-*` Tailwind classes.
 - [ ] All numbers use `tabular-nums`.

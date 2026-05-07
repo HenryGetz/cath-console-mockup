@@ -69,6 +69,6 @@ Cyan is the universal interactive color. Status colors appear only for system st
 
 ## 🛠 Environment Constraints
 
-* **Canvas:** 1280×800, landscape, touch.
+* **Canvas:** 1423×800, landscape, touch.
 * **Touch Targets:** 48×48px minimum.
 * **Lighting:** Optimized for dimmed cath lab. Dark background prevents wash-out under surgical lights.

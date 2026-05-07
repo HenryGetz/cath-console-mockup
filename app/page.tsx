@@ -1,13 +1,12 @@
 "use client";
 
 import Image from "next/image";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ChevronDown, ChevronUp, Settings } from "lucide-react";
 import acistAimLogo from "@/static/acist-aim-logo.png";
 import acistHdiLogo from "@/static/acist-hdi-logo.png";
 import acistLogo from "@/static/acist-logo.png";
 import acistRxiLogo from "@/static/acist-rxi-logo.png";
-import hdiImage from "@/static/hdi.jpg";
 import proLogo from "@/static/pro-logo.png";
 import pulseHubLogo from "@/static/pulse-hub-logo.png";
 import rxiGraphImage from "@/static/rxi-graph.jpg";
@@ -86,6 +85,7 @@ function DeviceTab({ label, logo }: DeviceTabProps) {
 }
 
 export default function PulseHubPage() {
+  const videoRef = useRef<HTMLVideoElement | null>(null);
   const [flowRate, setFlowRate] = useState(11.0);
   const [volume, setVolume] = useState(21.0);
   const [contrastAvailable] = useState(MAX_CONTRAST_AVAILABLE_ML);
@@ -95,6 +95,32 @@ export default function PulseHubPage() {
     0,
     100,
   );
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) {
+      return;
+    }
+
+    const startPlayback = async () => {
+      try {
+        if (video.paused) {
+          await video.play();
+        }
+      } catch {
+        // Some browsers block autoplay unless explicitly started later;
+        // keep the video ready so it can start once playback becomes available.
+      }
+    };
+
+    video.muted = true;
+    void startPlayback();
+    video.addEventListener("canplay", startPlayback);
+
+    return () => {
+      video.removeEventListener("canplay", startPlayback);
+    };
+  }, []);
 
   return (
     <div className="h-full w-full bg-[#0A0A0F] font-sans text-white tabular-nums">
@@ -237,13 +263,24 @@ export default function PulseHubPage() {
         </aside>
 
         <main className="relative min-w-0 flex-1 bg-[#0A0A0F]">
-          <section className="absolute inset-0 overflow-hidden bg-[#000000]">
-            <Image
-              src={hdiImage}
-              alt="HDi imaging viewport"
-              fill
-              priority
-              className="object-contain object-left"
+          <section className="absolute inset-0 overflow-hidden bg-black">
+            <video
+              ref={videoRef}
+              aria-hidden="true"
+              id="hdi-player"
+              tabIndex={-1}
+              className="absolute inset-0 h-full w-full bg-black object-cover"
+              style={{
+                WebkitTapHighlightColor: "transparent",
+                userSelect: "none",
+              }}
+              src="/static/hdi.mp4"
+              autoPlay
+              loop
+              muted
+              playsInline
+              preload="auto"
+              title="HDi patient loop"
             />
           </section>
         </main>
