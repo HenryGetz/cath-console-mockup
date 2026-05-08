@@ -155,7 +155,8 @@ const deviceVideos = [
     key: "rxi",
     label: "RXi",
     logo: acistRxiLogo,
-    src: "/static/rxi.mp4",
+    src: "/static/rxi.jpeg",
+    mediaType: "image",
     title: "RXi patient loop",
   },
   {
@@ -163,11 +164,13 @@ const deviceVideos = [
     label: "AiM",
     logo: acistAimLogo,
     src: "/static/aim.mp4",
+    mediaType: "video",
     title: "AiM patient loop",
   },
 ] as const;
 
 type DeviceVideo = (typeof deviceVideos)[number];
+type DeviceMediaType = "video" | "image";
 
 export default function PulseHubPage() {
   const videoRef = useRef<HTMLVideoElement | null>(null);
@@ -183,6 +186,7 @@ export default function PulseHubPage() {
     deviceVideos.find((device) => device.key === activeDeviceKey) ??
     deviceVideos[0];
   const isCathConsole = activeDevice.key === "pulse-hub";
+  const mediaType: DeviceMediaType = activeDevice.mediaType ?? "video";
 
   const contrastAvailablePercent = clamp(
     (contrastAvailable / MAX_CONTRAST_AVAILABLE_ML) * 100,
@@ -201,6 +205,10 @@ export default function PulseHubPage() {
   };
 
   useEffect(() => {
+    if (mediaType !== "video") {
+      return;
+    }
+
     const video = videoRef.current;
     if (!video) {
       return;
@@ -261,7 +269,7 @@ export default function PulseHubPage() {
       video.removeEventListener("canplay", onCanPlay);
       video.removeEventListener("timeupdate", updatePlaybackTime);
     };
-  }, [activeDevice.src]);
+  }, [activeDevice.src, mediaType]);
 
   const handleDeviceSelect = (key: DeviceVideo["key"]) => {
     const currentVideo = videoRef.current;
@@ -406,24 +414,32 @@ export default function PulseHubPage() {
 
         <main className="relative min-w-0 flex-1 bg-[#0A0A0F]">
           <section className="absolute inset-0 overflow-hidden bg-black">
-            <video
-              ref={videoRef}
-              aria-hidden="true"
-              id="hdi-player"
-              tabIndex={-1}
-              className="absolute inset-0 h-full w-full bg-black object-contain"
-              style={{
-                WebkitTapHighlightColor: "transparent",
-                userSelect: "none",
-              }}
-              src={activeDevice.src}
-              autoPlay
-              loop
-              muted
-              playsInline
-              preload="auto"
-              title={activeDevice.title}
-            />
+            {mediaType === "image" ? (
+              <img
+                className="absolute inset-0 h-full w-full object-contain bg-black"
+                src={activeDevice.src}
+                alt={activeDevice.title}
+              />
+            ) : (
+              <video
+                ref={videoRef}
+                aria-hidden="true"
+                id="hdi-player"
+                tabIndex={-1}
+                className="absolute inset-0 h-full w-full bg-black object-contain"
+                style={{
+                  WebkitTapHighlightColor: "transparent",
+                  userSelect: "none",
+                }}
+                src={activeDevice.src}
+                autoPlay
+                loop
+                muted
+                playsInline
+                preload="auto"
+                title={activeDevice.title}
+              />
+            )}
           </section>
         </main>
 
