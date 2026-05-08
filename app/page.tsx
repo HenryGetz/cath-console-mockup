@@ -170,23 +170,34 @@ const deviceVideos = [
 ] as const;
 
 type DeviceVideo = (typeof deviceVideos)[number];
-type DeviceMediaType = "video" | "image";
 
 export default function PulseHubPage() {
-  const videoRef = useRef<HTMLVideoElement | null>(null);
   const [flowRate, setFlowRate] = useState(11.0);
   const [volume, setVolume] = useState(21.0);
   const [contrastAvailable] = useState(MAX_CONTRAST_AVAILABLE_ML);
   const [activeDeviceKey, setActiveDeviceKey] =
     useState<DeviceVideo["key"]>("pulse-hub");
-  const playbackTimeRef = useRef(0);
-  const previousSourceRef = useRef("/static/hdi.mp4");
+  const playbackTimeRef = useRef<Record<DeviceVideo["key"], number>>({
+    "pulse-hub": 0,
+    hdi: 0,
+    pro: 0,
+    rxi: 0,
+    aim: 0,
+  });
+  const videoRefs = useRef<Record<DeviceVideo["key"], HTMLVideoElement | null>>(
+    {
+      "pulse-hub": null,
+      hdi: null,
+      pro: null,
+      rxi: null,
+      aim: null,
+    },
+  );
 
   const activeDevice =
     deviceVideos.find((device) => device.key === activeDeviceKey) ??
     deviceVideos[0];
   const isCathConsole = activeDevice.key === "pulse-hub";
-  const mediaType: DeviceMediaType = activeDevice.mediaType ?? "video";
 
   const contrastAvailablePercent = clamp(
     (contrastAvailable / MAX_CONTRAST_AVAILABLE_ML) * 100,
@@ -205,78 +216,36 @@ export default function PulseHubPage() {
   };
 
   useEffect(() => {
-    if (mediaType !== "video") {
-      return;
-    }
-
-    const video = videoRef.current;
-    if (!video) {
-      return;
-    }
-
-    const previousSource = previousSourceRef.current;
-    const sourceChanged = previousSource !== activeDevice.src;
-    previousSourceRef.current = activeDevice.src;
-
-    const setPlaybackPosition = () => {
-      if (
-        Number.isFinite(playbackTimeRef.current) &&
-        Number.isFinite(video.duration)
-      ) {
-        const safePlaybackTime = Math.max(
-          0,
-          Math.min(
-            playbackTimeRef.current,
-            Math.max(0, video.duration - 0.001),
-          ),
-        );
-        video.currentTime = safePlaybackTime;
-      }
-    };
-
-    const startPlayback = async () => {
-      if (sourceChanged) {
-        setPlaybackPosition();
+    Object.entries(videoRefs.current).forEach(([key, element]) => {
+      if (!element) {
+        return;
       }
 
-      try {
-        if (video.paused) {
-          await video.play();
+      if (key === activeDevice.key) {
+        const cachedTime = playbackTimeRef.current[key as DeviceVideo["key"]];
+        if (Number.isFinite(cachedTime) && Number.isFinite(element.duration)) {
+          element.currentTime = Math.max(
+            0,
+            Math.min(cachedTime, element.duration - 0.001),
+          );
         }
-      } catch {
-        // Some browsers block autoplay unless explicitly started later;
-        // keep the video ready so it can start once playback becomes available.
+
+        if (!element.paused) {
+          return;
+        }
+
+        void element.play().catch(() => {
+          // Autoplay may be blocked until a user interaction occurs.
+        });
+      } else {
+        playbackTimeRef.current[key as DeviceVideo["key"]] =
+          element.currentTime;
+        element.pause();
       }
-    };
-
-    const updatePlaybackTime = () => {
-      playbackTimeRef.current = video.currentTime;
-    };
-
-    video.muted = true;
-    video.addEventListener("timeupdate", updatePlaybackTime);
-    const onCanPlay = () => {
-      void startPlayback();
-    };
-
-    video.addEventListener("canplay", onCanPlay);
-
-    if (video.readyState >= 2) {
-      void startPlayback();
-    }
-
-    return () => {
-      video.removeEventListener("canplay", onCanPlay);
-      video.removeEventListener("timeupdate", updatePlaybackTime);
-    };
-  }, [activeDevice.src, mediaType]);
+    });
+  }, [activeDevice.key]);
 
   const handleDeviceSelect = (key: DeviceVideo["key"]) => {
-    const currentVideo = videoRef.current;
-    if (currentVideo) {
-      playbackTimeRef.current = currentVideo.currentTime;
-    }
-
     setActiveDeviceKey(key);
   };
 
@@ -414,32 +383,53 @@ export default function PulseHubPage() {
 
         <main className="relative min-w-0 flex-1 bg-[#0A0A0F]">
           <section className="absolute inset-0 overflow-hidden bg-black">
-            {mediaType === "image" ? (
-              <img
-                className="absolute inset-0 h-full w-full object-contain bg-black"
-                src={activeDevice.src}
-                alt={activeDevice.title}
-              />
-            ) : (
-              <video
-                ref={videoRef}
-                aria-hidden="true"
-                id="hdi-player"
-                tabIndex={-1}
-                className="absolute inset-0 h-full w-full bg-black object-contain"
-                style={{
-                  WebkitTapHighlightColor: "transparent",
-                  userSelect: "none",
-                }}
-                src={activeDevice.src}
-                autoPlay
-                loop
-                muted
-                playsInline
-                preload="auto"
-                title={activeDevice.title}
-              />
-            )}
+            {deviceVideos.map((device) => {
+              const isActive = activeDevice.key === device.key;
+
+              if (device.mediaType === "image") {
+                return (
+                  <img
+                    key={device.key}
+                    aria-hidden={!isActive}
+                    className={`absolute inset-0 h-full w-full bg-black object-contain transition-opacity duration-150 ${
+                      isActive ? "opacity-100" : "pointer-events-none opacity-0"
+                    }`}
+                    src={device.src}
+                    alt={device.title}
+                  />
+                );
+              }
+
+              return (
+                <video
+                  key={device.key}
+                  ref={(element) => {
+                    if (element) {
+                      videoRefs.current[device.key] = element;
+                    }
+                  }}
+                  aria-hidden={!isActive}
+                  loop
+                  muted
+                  playsInline
+                  preload="auto"
+                  tabIndex={-1}
+                  className={`absolute inset-0 h-full w-full bg-black object-contain transition-opacity duration-150 ${
+                    isActive ? "opacity-100" : "pointer-events-none opacity-0"
+                  }`}
+                  style={{
+                    WebkitTapHighlightColor: "transparent",
+                    userSelect: "none",
+                  }}
+                  src={device.src}
+                  title={device.title}
+                  onTimeUpdate={(event) => {
+                    playbackTimeRef.current[device.key] =
+                      event.currentTarget.currentTime;
+                  }}
+                />
+              );
+            })}
           </section>
         </main>
 
