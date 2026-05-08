@@ -148,8 +148,9 @@ const deviceVideos = [
     key: "pro",
     label: "Pro",
     logo: proLogo,
-    src: "/static/pro.mp4",
-    title: "Pro patient loop",
+    src: "/screens/vol.jpg",
+    mediaType: "image",
+    title: "Pro screen",
   },
   {
     key: "rxi",
@@ -163,9 +164,9 @@ const deviceVideos = [
     key: "aim",
     label: "AiM",
     logo: acistAimLogo,
-    src: "/static/aim.mp4",
-    mediaType: "video",
-    title: "AiM patient loop",
+    src: "/screens/flo.jpg",
+    mediaType: "image",
+    title: "AiM screen",
   },
 ] as const;
 
@@ -388,15 +389,21 @@ export default function PulseHubPage() {
 
               if (device.mediaType === "image") {
                 return (
-                  <img
+                  <div
                     key={device.key}
                     aria-hidden={!isActive}
-                    className={`absolute inset-0 h-full w-full bg-black object-contain transition-opacity duration-150 ${
+                    className={`absolute inset-0 transition-opacity duration-150 ${
                       isActive ? "opacity-100" : "pointer-events-none opacity-0"
                     }`}
-                    src={device.src}
-                    alt={device.title}
-                  />
+                  >
+                    <Image
+                      src={device.src}
+                      alt={device.title}
+                      fill
+                      sizes="100vw"
+                      className="bg-black object-contain"
+                    />
+                  </div>
                 );
               }
 
